@@ -61,4 +61,32 @@ router.post(
   }
 );
 
+// membuat route get mahasiswa by id
+router.get("/(:id)", (req, res) => {
+  let id = req.params.id;
+  connect.query(
+    `SELECT * FROM mahasiswa where id_mahasiswa=${id}`,
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({
+          status: false,
+          message: "Internal Server Error",
+          error: err,
+        });
+      }
+      if (rows.legth <= 0) {
+        return res.status(404).json({
+          status: false,
+          message: "Not Found",
+        });
+      } else {
+        return res.status(200).json({
+          status: true,
+          message: "Data Mahasiswa",
+          data: rows[0],
+        });
+      }
+    }
+  );
+});
 module.exports = router;
