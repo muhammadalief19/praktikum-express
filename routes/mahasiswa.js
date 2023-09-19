@@ -128,4 +128,26 @@ router.patch(
   }
 );
 
+// membuat route delete
+router.delete("/delete/(:id)", (req, res) => {
+  let id = req.params.id;
+  connect.query(
+    `DELETE FROM mahasiswa WHERE id_mahasiswa=${id}`,
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({
+          status: false,
+          message: "Internal Server Error",
+          error: err,
+        });
+      } else {
+        return res.status(500).json({
+          status: true,
+          message: "Mahasiswa berhasil di delete",
+        });
+      }
+    }
+  );
+});
+
 module.exports = router;
