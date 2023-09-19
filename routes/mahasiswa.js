@@ -89,4 +89,43 @@ router.get("/(:id)", (req, res) => {
     }
   );
 });
+
+// membuat route update
+router.patch(
+  "/update/(:id)",
+  [body("nama").notEmpty(), body("nrp").notEmpty()],
+  (req, res) => {
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      return res.status(422).json({
+        error: error.array(),
+      });
+    }
+    let id = req.params.id;
+    let data = {
+      nama: req.body.nama,
+      nrp: req.body.nrp,
+    };
+    connect.query(
+      `UPDATE mahasiswa set ? where id_mahasiswa=${id}`,
+      data,
+      (err, rows) => {
+        if (err) {
+          return res.status(500).json({
+            status: false,
+            message: "Internal Server Error",
+            error: err,
+          });
+        } else {
+          return res.status(200).json({
+            status: true,
+            message: "Mahasiswa berhasil diupdate",
+            data: rows[0],
+          });
+        }
+      }
+    );
+  }
+);
+
 module.exports = router;
