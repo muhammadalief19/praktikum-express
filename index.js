@@ -3,6 +3,11 @@ const app = express();
 const port = 1908;
 const mhsRouter = require("./routes/mahasiswa.js");
 
+// import body-parser
+const bodyPs = require("body-parser");
+app.use(bodyPs.urlencoded({ extended: false }));
+app.use(bodyPs.json());
+
 app.get("/", (req, res) => {
   res.send("Hallo Sayang ❤️");
 });
