@@ -111,7 +111,7 @@ router.patch("/update/(:id)", [body("nama_jurusan").notEmpty()], (req, res) => {
 // membuat route delete
 router.delete("/delete/(:id)", (req, res) => {
   let id = req.params.id;
-  connect.query(`DELETE FROM jurusan WHERE j=${id}`, (err, rows) => {
+  connect.query(`DELETE FROM jurusan WHERE id_j=${id}`, (err, rows) => {
     if (err) {
       return res.status(500).json({
         status: false,
