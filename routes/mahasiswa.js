@@ -27,7 +27,7 @@ router.get("/", (req, res) => {
 // membuat route store
 router.post(
   "/store",
-  [body("nama").notEmpty(), body("nrp").notEmpty()],
+  [body("nama").notEmpty(), body("nrp").notEmpty(), body("jurusan")],
   (req, res) => {
     const error = validationResult(req);
 
@@ -41,6 +41,7 @@ router.post(
     let data = {
       nama: req.body.nama,
       nrp: req.body.nrp,
+      id_jurusan: req.body.jurusan,
     };
 
     connect.query("INSERT INTO mahasiswa set ? ", data, (err, rows) => {
@@ -74,7 +75,7 @@ router.get("/(:id)", (req, res) => {
           error: err,
         });
       }
-      if (rows.legth <= 0) {
+      if (rows.length <= 0) {
         return res.status(404).json({
           status: false,
           message: "Not Found",
@@ -83,7 +84,7 @@ router.get("/(:id)", (req, res) => {
         return res.status(200).json({
           status: true,
           message: "Data Mahasiswa",
-          data: rows[0],
+          payload: rows[0],
         });
       }
     }
@@ -93,7 +94,7 @@ router.get("/(:id)", (req, res) => {
 // membuat route update
 router.patch(
   "/update/(:id)",
-  [body("nama").notEmpty(), body("nrp").notEmpty()],
+  [body("nama").notEmpty(), body("nrp").notEmpty(), body("jurusan").notEmpty()],
   (req, res) => {
     const error = validationResult(req);
     if (!error.isEmpty()) {
@@ -105,6 +106,7 @@ router.patch(
     let data = {
       nama: req.body.nama,
       nrp: req.body.nrp,
+      id_jurusan: req.body.jurusan,
     };
     connect.query(
       `UPDATE mahasiswa set ? where id_mahasiswa=${id}`,
