@@ -6,6 +6,19 @@ const fs = require("fs");
 const multer = require("multer");
 const path = require("path");
 
+// file filter configuration
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/jpeg" ||
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/webp"
+  ) {
+    cb(null, true); // file diizinkan
+  } else {
+    cb(new Error("File Gambar harus berformat jpg,jpeg,png,webp"), false);
+  }
+};
 // Storage Configuration and Destination Configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -16,7 +29,7 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + path.extname(file.originalname));
   },
 });
-const upload = multer({ storage: storage });
+const upload = multer({ storage: storage, fileFilter: fileFilter });
 
 // membuat route /
 router.get("/", (req, res) => {
