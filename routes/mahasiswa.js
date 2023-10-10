@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router(); // deklarasi router
 const { body, validationResult } = require("express-validator");
 const connect = require("../config/db.js"); // import database
+const fs = require("fs");
 const multer = require("multer");
 const path = require("path");
 
@@ -110,6 +111,7 @@ router.get("/(:id)", (req, res) => {
 // membuat route update
 router.patch(
   "/update/(:id)",
+  upload.single("foto"),
   [body("nama").notEmpty(), body("nrp").notEmpty(), body("jurusan").notEmpty()],
   (req, res) => {
     const error = validationResult(req);
@@ -119,14 +121,11 @@ router.patch(
       });
     }
     let id = req.params.id;
-    let data = {
-      nama: req.body.nama,
-      nrp: req.body.nrp,
-      id_jurusan: req.body.jurusan,
-    };
+    let foto = req.file ? req.file.filename : null;
+
     connect.query(
-      `UPDATE mahasiswa set ? where id_mahasiswa=${id}`,
-      data,
+      "SELECT * FROM mahasiswa WHERE id_mahasiswa=?",
+      id,
       (err, rows) => {
         if (err) {
           return res.status(500).json({
@@ -134,13 +133,48 @@ router.patch(
             message: "Internal Server Error",
             error: err,
           });
-        } else {
-          return res.status(200).json({
-            status: true,
-            message: "Mahasiswa berhasil diupdate",
-            data: rows[0],
+        }
+        if (rows.length === 0) {
+          return res.status(404).json({
+            status: false,
+            message: "Data tidak ditemukan",
           });
         }
+        const namaFileLama = rows[0].foto;
+
+        // hapus file lama jika ada
+        if (namaFileLama && foto) {
+          const pathFileLama = path.join(
+            __dirname,
+            "../public/images",
+            namaFileLama
+          );
+          fs.unlinkSync(pathFileLama);
+        }
+        let data = {
+          nama: req.body.nama,
+          nrp: req.body.nrp,
+          id_jurusan: req.body.jurusan,
+          foto: foto,
+        };
+        connect.query(
+          `UPDATE mahasiswa set ? where id_mahasiswa=${id}`,
+          data,
+          (err, rows) => {
+            if (err) {
+              return res.status(500).json({
+                status: false,
+                message: "Internal Server Error",
+                error: err,
+              });
+            }
+            return res.status(200).json({
+              status: true,
+              message: "Mahasiswa berhasil diupdate",
+              payload: data,
+            });
+          }
+        );
       }
     );
   }
