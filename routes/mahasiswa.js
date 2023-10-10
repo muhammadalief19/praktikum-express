@@ -184,7 +184,8 @@ router.patch(
 router.delete("/delete/(:id)", (req, res) => {
   let id = req.params.id;
   connect.query(
-    `DELETE FROM mahasiswa WHERE id_mahasiswa=${id}`,
+    "SELECT * FROM mahasiswa WHERE id_mahasiswa=?",
+    id,
     (err, rows) => {
       if (err) {
         return res.status(500).json({
@@ -192,12 +193,41 @@ router.delete("/delete/(:id)", (req, res) => {
           message: "Internal Server Error",
           error: err,
         });
-      } else {
-        return res.status(500).json({
-          status: true,
-          message: "Mahasiswa berhasil di delete",
+      }
+      if (rows.length === 0) {
+        return res.status(404).json({
+          status: false,
+          message: "Data tidak ditemukan",
         });
       }
+      const namaFileLama = rows[0].foto;
+
+      // hapus file lama jika ada
+      if (namaFileLama) {
+        const pathFileLama = path.join(
+          __dirname,
+          "../public/images",
+          namaFileLama
+        );
+        fs.unlinkSync(pathFileLama);
+      }
+      connect.query(
+        `DELETE FROM mahasiswa WHERE id_mahasiswa=${id}`,
+        (err, rows) => {
+          if (err) {
+            return res.status(500).json({
+              status: false,
+              message: "Internal Server Error",
+              error: err,
+            });
+          } else {
+            return res.status(200).json({
+              status: true,
+              message: "Mahasiswa berhasil di delete",
+            });
+          }
+        }
+      );
     }
   );
 });
