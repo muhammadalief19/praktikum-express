@@ -2,6 +2,20 @@ const express = require("express");
 const router = express.Router(); // deklarasi router
 const { body, validationResult } = require("express-validator");
 const connect = require("../config/db.js"); // import database
+const multer = require("multer");
+const path = require("path");
+
+// Storage Configuration and Destination Configuration
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/images");
+  },
+  filename: (req, file, cb) => {
+    console.log(file);
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+const upload = multer({ storage: storage });
 
 // membuat route /
 router.get("/", (req, res) => {
@@ -27,7 +41,8 @@ router.get("/", (req, res) => {
 // membuat route store
 router.post(
   "/store",
-  [body("nama").notEmpty(), body("nrp").notEmpty(), body("jurusan")],
+  upload.single("foto"),
+  [(body("nama").notEmpty(), body("nrp").notEmpty(), body("jurusan"))],
   (req, res) => {
     const error = validationResult(req);
 
@@ -42,6 +57,7 @@ router.post(
       nama: req.body.nama,
       nrp: req.body.nrp,
       id_jurusan: req.body.jurusan,
+      foto: req.file.filename,
     };
 
     connect.query("INSERT INTO mahasiswa set ? ", data, (err, rows) => {
@@ -55,7 +71,7 @@ router.post(
         return res.status(201).json({
           status: true,
           message: "Mahasiswa berhasil ditambahkan",
-          data: rows[0],
+          payload: data,
         });
       }
     });
