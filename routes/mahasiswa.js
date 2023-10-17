@@ -55,7 +55,10 @@ router.get("/", (req, res) => {
 // membuat route store
 router.post(
   "/store",
-  upload.single("foto"),
+  upload.fields([
+    { name: "foto", maxCount: 1 },
+    { name: "foto_ktm", maxCount: 1 },
+  ]),
   [(body("nama").notEmpty(), body("nrp").notEmpty(), body("jurusan"))],
   (req, res) => {
     const error = validationResult(req);
@@ -71,7 +74,8 @@ router.post(
       nama: req.body.nama,
       nrp: req.body.nrp,
       id_jurusan: req.body.jurusan,
-      foto: req.file.filename,
+      foto: req.files.foto[0].filename,
+      foto_ktm: req.files.foto_ktm[0].filename,
     };
 
     connect.query("INSERT INTO mahasiswa set ? ", data, (err, rows) => {
