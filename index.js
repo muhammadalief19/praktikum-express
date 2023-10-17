@@ -6,10 +6,11 @@ const jurusanRouter = require("./routes/jurusan.js");
 const cors = require("cors");
 // import body-parser
 const bodyPs = require("body-parser");
-
+const path = require("path");
+app.use(cors);
+app.use("/static", express.static(path.join(__dirname, "public/images")));
 app.use(bodyPs.urlencoded({ extended: false }));
 app.use(bodyPs.json());
-app.use(cors);
 
 app.get("/", (req, res) => {
   res.send("Hallo Sayang ❤️");
