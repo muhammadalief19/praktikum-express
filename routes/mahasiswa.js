@@ -235,10 +235,19 @@ router.delete("/delete/(:id)", (req, res) => {
         });
       }
       const fotoLama = rows[0].foto;
+      const fotoKtmLama = rows[0].foto_ktm;
 
       // hapus file lama jika ada
       if (fotoLama) {
         const pathFileLama = path.join(__dirname, "../public/images", fotoLama);
+        fs.unlinkSync(pathFileLama);
+      }
+      if (fotoKtmLama) {
+        const pathFileLama = path.join(
+          __dirname,
+          "../public/images",
+          fotoKtmLama
+        );
         fs.unlinkSync(pathFileLama);
       }
       connect.query(
