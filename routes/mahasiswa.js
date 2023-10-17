@@ -128,7 +128,10 @@ router.get("/(:id)", (req, res) => {
 // membuat route update
 router.patch(
   "/update/(:id)",
-  upload.single("foto"),
+  upload.fields([
+    { name: "foto", maxCount: 1 },
+    { name: "foto_ktm", maxCount: 1 },
+  ]),
   [body("nama").notEmpty(), body("nrp").notEmpty(), body("jurusan").notEmpty()],
   (req, res) => {
     const error = validationResult(req);
@@ -138,7 +141,10 @@ router.patch(
       });
     }
     let id = req.params.id;
-    let foto = req.file ? req.file.filename : null;
+    let foto = req.files["foto"] ? req.files["foto"][0].filename : null;
+    let fotoKtm = req.files["foto_ktm"]
+      ? req.files["foto_ktm"][0].filename
+      : null;
 
     connect.query(
       "SELECT * FROM mahasiswa WHERE id_mahasiswa=?",
@@ -157,22 +163,33 @@ router.patch(
             message: "Data tidak ditemukan",
           });
         }
-        const namaFileLama = rows[0].foto;
+        const fotoLama = rows[0].foto;
+        const fotoKtmLama = rows[0].foto_ktm;
 
         // hapus file lama jika ada
-        if (namaFileLama && foto) {
+        if (fotoLama && foto) {
           const pathFileLama = path.join(
             __dirname,
             "../public/images",
-            namaFileLama
+            fotoLama
           );
           fs.unlinkSync(pathFileLama);
         }
+        if (fotoKtmLama && fotoKtm) {
+          const pathFileLama = path.join(
+            __dirname,
+            "../public/images",
+            fotoKtmLama
+          );
+          fs.unlinkSync(pathFileLama);
+        }
+
         let data = {
           nama: req.body.nama,
           nrp: req.body.nrp,
           id_jurusan: req.body.jurusan,
           foto: foto,
+          foto_ktm: fotoKtm,
         };
         connect.query(
           `UPDATE mahasiswa set ? where id_mahasiswa=${id}`,
@@ -217,15 +234,11 @@ router.delete("/delete/(:id)", (req, res) => {
           message: "Data tidak ditemukan",
         });
       }
-      const namaFileLama = rows[0].foto;
+      const fotoLama = rows[0].foto;
 
       // hapus file lama jika ada
-      if (namaFileLama) {
-        const pathFileLama = path.join(
-          __dirname,
-          "../public/images",
-          namaFileLama
-        );
+      if (fotoLama) {
+        const pathFileLama = path.join(__dirname, "../public/images", fotoLama);
         fs.unlinkSync(pathFileLama);
       }
       connect.query(
