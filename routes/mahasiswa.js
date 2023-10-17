@@ -34,7 +34,7 @@ const upload = multer({ storage: storage, fileFilter: fileFilter });
 // membuat route /
 router.get("/", (req, res) => {
   connect.query(
-    "SELECT * FROM mahasiswa ORDER BY id_mahasiswa DESC",
+    "SELECT m.*, j.nama_jurusan FROM mahasiswa as m JOIN jurusan as j ON m.id_jurusan = j.id_j ORDER BY id_mahasiswa DESC",
     (err, rows) => {
       if (err) {
         return res.status(500).json({
