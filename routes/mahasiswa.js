@@ -188,9 +188,14 @@ router.patch(
           nama: req.body.nama,
           nrp: req.body.nrp,
           id_jurusan: req.body.jurusan,
-          foto: foto,
-          foto_ktm: fotoKtm,
         };
+
+        if (foto) {
+          data.foto = foto;
+        }
+        if (fotoKtm) {
+          data.foto_ktm = fotoKtm;
+        }
         connect.query(
           `UPDATE mahasiswa set ? where id_mahasiswa=${id}`,
           data,
