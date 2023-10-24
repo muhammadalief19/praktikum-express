@@ -119,7 +119,7 @@ router.delete("/delete/(:id)", (req, res) => {
         error: err,
       });
     } else {
-      return res.status(500).json({
+      return res.status(200).json({
         status: true,
         message: "Jurusan berhasil di delete",
       });
