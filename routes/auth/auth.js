@@ -31,7 +31,7 @@ router.post(
       }
 
       if (result.length > 0) {
-        return res.stastatus(500).json({
+        return res.status(500).json({
           status: false,
           message: "Pengguna sudah terdaftar",
         });
@@ -48,7 +48,7 @@ router.post(
         }
 
         const payload = { userId: result.insertId, username };
-        const token = jwt.sign(payload.secretKey);
+        const token = jwt.sign(payload, secretKey);
         const updateTokenQuery = "UPDATE users SET token = ? WHERE id = ?";
         connect.query(
           updateTokenQuery,
