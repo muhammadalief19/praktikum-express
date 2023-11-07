@@ -12,7 +12,7 @@ const authenticateToken = (req, res, next) => {
     });
   }
 
-  const tokenParts = token.spilt(" ");
+  const tokenParts = token.split(" ");
   if (tokenParts.length !== 2 || tokenParts[0] !== "Bearer") {
     return res.status(401).json({
       status: false,
