@@ -31,8 +31,10 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage, fileFilter: fileFilter });
 
+const authenticateToken = require("../routes/auth/middleware/authenticateToken.js");
+
 // membuat route /
-router.get("/", (req, res) => {
+router.get("/", authenticateToken, (req, res) => {
   connect.query(
     "SELECT m.*, j.nama_jurusan FROM mahasiswa as m JOIN jurusan as j ON m.id_jurusan = j.id_j ORDER BY id_mahasiswa DESC",
     (err, rows) => {
@@ -55,6 +57,7 @@ router.get("/", (req, res) => {
 // membuat route store
 router.post(
   "/store",
+  authenticateToken,
   upload.fields([
     { name: "foto", maxCount: 1 },
     { name: "foto_ktm", maxCount: 1 },
@@ -128,6 +131,7 @@ router.get("/(:id)", (req, res) => {
 // membuat route update
 router.patch(
   "/update/(:id)",
+  authenticateToken,
   upload.fields([
     { name: "foto", maxCount: 1 },
     { name: "foto_ktm", maxCount: 1 },
@@ -220,7 +224,7 @@ router.patch(
 );
 
 // membuat route delete
-router.delete("/delete/(:id)", (req, res) => {
+router.delete("/delete/(:id)", authenticateToken, (req, res) => {
   let id = req.params.id;
   connect.query(
     "SELECT * FROM mahasiswa WHERE id_mahasiswa=?",

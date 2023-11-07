@@ -22,6 +22,10 @@ app.use("/api/mhs", mhsRouter);
 // membuat route /api/jurusan
 app.use("/api/jurusan", jurusanRouter);
 
+// membuat route /api/auth
+const auth = require("./routes/auth/auth.js");
+app.use("/api/auth", auth);
+
 app.listen(port, () => {
   console.log(`Aplikasi ini berjalan pada port: ${port}`);
 });
